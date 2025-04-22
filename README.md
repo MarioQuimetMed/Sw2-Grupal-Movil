@@ -1,6 +1,15 @@
+
 # sw2_grupal_movil
 
 A new Flutter project.
+
+estoy al pedndiende de que puedo servir de ayuda, de lo que se necesite
+
+audifonos, volumen fuerte y entrar al siguiente link:
+          https://youtu.be/_xVgACUGpEg?si=zkm3587fNQkCi188
+adelantar los primeros 3 minutos
+
+
 
 ## Getting Started
 
