@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:sw2_grupal_movil/screens/Budget/BudgetScreen.dart';
+import 'package:sw2_grupal_movil/screens/health/healthScoreScreen.dart';
+import 'package:sw2_grupal_movil/screens/stripe/PlansScreen.dart';
+import 'package:sw2_grupal_movil/screens/transacction/transactionScreen.dart';
 import 'account/accountHomeScreen.dart';
 
 class NavigatorBar extends StatefulWidget {
@@ -15,15 +19,16 @@ class _NavigatorBarState extends State<NavigatorBar> {
   // Lista de páginas a mostrar
   final List<Widget> _pages = const [
     AccountHomeScreen(),
-    Home(),
-    Home(),
+    TransactionScreen(),
+    BudgetScreen(),
+    HealthScoreScreen(),
+    PlansScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     // Obtenemos los colores del tema actual
     final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -60,7 +65,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.creditcard),
                 activeIcon: Icon(CupertinoIcons.creditcard_fill),
-                label: 'Cuentas',
+                label: 'Cuenta',
               ),
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.arrow_right_arrow_left),
@@ -69,9 +74,19 @@ class _NavigatorBarState extends State<NavigatorBar> {
                 label: 'Transacciones',
               ),
               BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.person),
+                icon: Icon(CupertinoIcons.doc_chart),
+                activeIcon: Icon(CupertinoIcons.doc_chart_fill),
+                label: 'Presupuestos',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.waveform_path_ecg),
                 activeIcon: Icon(CupertinoIcons.person_fill),
-                label: 'Perfil',
+                label: 'Salud',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.calendar_badge_plus),
+                activeIcon: Icon(CupertinoIcons.calendar_badge_plus),
+                label: 'Plan',
               ),
             ],
           ),

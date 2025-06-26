@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/authProvider.dart';
 import '../NavigatorBar.dart';
 
@@ -28,6 +30,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
+
+  bool _acceptTerms = false;
 
   @override
   Widget build(BuildContext context) {
@@ -238,11 +242,94 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       const SizedBox(height: 32),
 
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: _acceptTerms,
+                              onChanged: (value) {
+                                setState(() {
+                                  _acceptTerms = value ?? false;
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _acceptTerms = !_acceptTerms;
+                                  });
+                                },
+                                child: RichText(
+                                  text: TextSpan(
+                                    style:
+                                        const TextStyle(color: Colors.black87),
+                                    children: [
+                                      const TextSpan(text: 'Acepto los '),
+                                      TextSpan(
+                                        text: 'Términos y Condiciones',
+                                        style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () async {
+                                            final url = Uri.parse(
+                                                'https://tusitio.com/terminos');
+                                            if (await canLaunchUrl(url)) {
+                                              await launchUrl(url,
+                                                  mode: LaunchMode
+                                                      .externalApplication);
+                                            }
+                                          },
+                                      ),
+                                      const TextSpan(text: ' y la '),
+                                      TextSpan(
+                                        text: 'Política de Privacidad',
+                                        style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () async {
+                                            final url = Uri.parse(
+                                                'https://tusitio.com/privacidad');
+                                            if (await canLaunchUrl(url)) {
+                                              await launchUrl(url,
+                                                  mode: LaunchMode
+                                                      .externalApplication);
+                                            }
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Mensaje si no acepta términos
+                      if (!_acceptTerms)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            'Debes aceptar los términos y condiciones para continuar.',
+                            style:
+                                TextStyle(color: Colors.red[700], fontSize: 13),
+                          ),
+                        ),
+
                       // Botón de registro
                       SizedBox(
                         height: 55,
                         child: ElevatedButton(
-                          onPressed: authProvider.isLoading
+                          onPressed: authProvider.isLoading || !_acceptTerms
                               ? null
                               : () async {
                                   if (_formKey.currentState!.validate()) {
@@ -251,14 +338,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       _emailController.text,
                                       _passwordController.text,
                                     );
-
                                     if (success && context.mounted) {
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
                                             builder: (_) =>
                                                 const NavigatorBar()),
                                       );
-
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(

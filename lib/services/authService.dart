@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sw2_grupal_movil/models/AuthRegisterModel.dart';
 import '../api/dio_client.dart';
 import '../models/AuthServiceModel.dart';
 
@@ -41,7 +42,7 @@ class AuthService {
   ///
   /// Recibe [username], [email], [password] y devuelve un [AuthResponse] con el usuario y token
   /// o lanza una excepción en caso de error
-  Future<AuthResponse> register(
+  Future<AuthRegister> register(
       String username, String email, String password) async {
     try {
       final response = await _dioClient.post(
@@ -54,7 +55,7 @@ class AuthService {
         },
       );
 
-      return AuthResponse.fromJson(response.data);
+      return AuthRegister.fromJson(response.data);
     } on DioException catch (e) {
       // Manejo específico para errores de Dio
       if (e.response?.statusCode == 400) {

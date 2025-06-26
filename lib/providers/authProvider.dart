@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sw2_grupal_movil/models/HealthScoreModel.dart';
+import 'package:sw2_grupal_movil/services/healthScoreService.dart';
 import '../main.dart';
 import '../models/AuthServiceModel.dart';
 import '../services/authService.dart';
 
 class AuthProvider extends SafeChangeNotifier {
   final AuthService _authService = AuthService();
+  final HealthScoreService _healthScoreService = HealthScoreService();
 
   User? _user;
   String? _token;
@@ -18,6 +21,11 @@ class AuthProvider extends SafeChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _token != null && _user != null;
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
 
   // Método de login
   Future<bool> login(String email, String password) async {
@@ -92,12 +100,9 @@ class AuthProvider extends SafeChangeNotifier {
     try {
       final response = await _authService.register(username, email, password);
 
-      // Guardamos los datos de la respuesta
-      _user = response.user;
-      _token = response.accessToken;
-
-      // Guardamos el token en almacenamiento persistente
-      await _saveTokenToStorage(_token!);
+      // _user = response.user;
+      // _token = response.accessToken;
+      // await _saveTokenToStorage(_token!);
 
       _isLoading = false;
       notifyListeners();
@@ -109,6 +114,18 @@ class AuthProvider extends SafeChangeNotifier {
 
       notifyListeners();
       return false;
+    }
+  }
+
+  //Metodo para obtener la salud financiera del usuario
+  Future<HeatlhScore> getHealthScore() async {
+    try {
+      final healthScore = await _healthScoreService.getHealthScore();
+      return healthScore;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      throw e; // Re-lanzar la excepción para manejarla en el lugar donde se llama
     }
   }
 }

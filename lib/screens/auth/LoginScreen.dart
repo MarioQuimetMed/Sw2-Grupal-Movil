@@ -1,8 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sw2_grupal_movil/screens/NavigatorBar.dart';
 import 'package:sw2_grupal_movil/screens/auth/RegisterScreen.dart';
+import 'package:sw2_grupal_movil/screens/stripe/StripeScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/authProvider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -238,6 +241,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           TextButton(
                             onPressed: () {
+                              // Limpiar el error antes de navegar
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .clearError();
+
                               // Navegar a la pantalla de registro
                               Navigator.push(
                                 context,
@@ -253,7 +260,51 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+
+                          // Texto para acceder a los terminos y condiciones
                         ],
+                      ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: const TextStyle(color: Colors.black87),
+                          children: [
+                            // const TextSpan(text: 'Acepto los '),
+                            TextSpan(
+                              text: 'Términos y Condiciones',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  final url = Uri.parse(
+                                      'https://sw2-sitioweb-626ll.ondigitalocean.app/terminos');
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url,
+                                        mode: LaunchMode.externalApplication);
+                                  }
+                                },
+                            ),
+                            const TextSpan(text: ' y la '),
+                            TextSpan(
+                              text: 'Política de Privacidad',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  final url = Uri.parse(
+                                      'https://sw2-sitioweb-626ll.ondigitalocean.app/privacidad');
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url,
+                                        mode: LaunchMode.externalApplication);
+                                  }
+                                },
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

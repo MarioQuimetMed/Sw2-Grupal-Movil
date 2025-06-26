@@ -33,7 +33,7 @@ class AccountGetResponse {
   factory AccountGetResponse.fromJson(Map<String, dynamic> json) =>
       AccountGetResponse(
         id: json["id"],
-        balance: json["balance"],
+        balance: json["balance"].toString(),
         usuarioId: json["usuarioId"],
         name: json["name"],
         isActive: json["is_active"],

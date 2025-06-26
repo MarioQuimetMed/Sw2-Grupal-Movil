@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sw2_grupal_movil/models/transactionGetByMonth.dart';
 import '../api/dio_client.dart';
 import '../models/transacctionCreateModel.dart';
 
@@ -36,6 +37,32 @@ class TransactionService {
       } else {
         throw 'Error al procesar la transacción: ${e.message}';
       }
+    } catch (e) {
+      // Otros errores inesperados
+      throw 'Error inesperado: $e';
+    }
+  }
+
+  //Metodo para Obtener transacciones de una cuenta en un mes y año determinado
+  Future<List<TransactionGetByMonth>> getTransactionsByAccountAndDate(
+      int accountId, int month, int year) async {
+    try {
+      final response = await _dioClient.get(
+        'transactions',
+        queryParameters: {
+          'idAccount': accountId,
+          'month': month,
+          'year': year,
+        },
+      );
+
+      // Mapea la respuesta a una lista de objetos TransactionCreateResponse
+      return (response.data as List)
+          .map((item) => TransactionGetByMonth.fromJson(item))
+          .toList();
+    } on DioException catch (e) {
+      // Manejo de errores específico para Dio
+      throw 'Error al obtener transacciones: ${e.message}';
     } catch (e) {
       // Otros errores inesperados
       throw 'Error inesperado: $e';

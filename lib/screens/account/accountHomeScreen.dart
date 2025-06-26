@@ -5,7 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:sw2_grupal_movil/models/transacctionCreateModel.dart';
+import 'package:sw2_grupal_movil/providers/authProvider.dart';
 import 'package:sw2_grupal_movil/providers/transactionProvider.dart';
+import 'package:sw2_grupal_movil/screens/account/createAccountScreen.dart';
+import 'package:sw2_grupal_movil/screens/account/suggestionsScreen.dart';
+import 'package:sw2_grupal_movil/screens/auth/LoginScreen.dart';
 import '../../providers/accountProvider.dart';
 import 'package:intl/intl.dart';
 
@@ -83,7 +87,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
     try {
       final numericBalance = double.parse(balance);
       return NumberFormat.currency(
-        symbol: 'S/. ',
+        symbol: 'Bs/. ',
         decimalDigits: 2,
       ).format(numericBalance);
     } catch (e) {
@@ -172,7 +176,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
 
     if (accountProvider.accounts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No tienes cuentas disponibles')),
+        const SnackBar(content: Text('No tienes cuenta disponible')),
       );
       return;
     }
@@ -376,6 +380,20 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                   .refreshAccounts();
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () {
+              // Aquí llamas a tu método de logout del AuthProvider
+              Provider.of<AuthProvider>(context, listen: false).logout();
+              // Y navegas al LoginScreen o pantalla inicial
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Consumer<AccountProvider>(
@@ -452,7 +470,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No tienes cuentas',
+                    'No tienes cuenta',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.grey[800],
                           fontWeight: FontWeight.w600,
@@ -463,6 +481,28 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                     'Contacta con soporte para crear una cuenta',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
+                  // Boton para crear una cuenta
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Aquí podrías navegar a una pantalla para crear una cuenta
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountCreateScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text('Crear cuenta'),
+                  ),
                 ],
               ),
             );
@@ -471,6 +511,12 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
           // Si solo hay una cuenta, mostrarla de forma especial
           if (accountProvider.accounts.length == 1) {
             final account = accountProvider.accounts.first;
+            //setear la cuenta seleccionada en el provider
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              accountProvider.selectAccount(account.id);
+            });
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -574,7 +620,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                       Expanded(
                         child: _buildActionButton(
                           icon: CupertinoIcons.arrow_right,
-                          label: 'Transferir',
+                          label: 'Transacciones',
                           onTap: () {
                             // Acción para transferir
                           },
@@ -584,7 +630,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                       Expanded(
                         child: _buildActionButton(
                           icon: CupertinoIcons.doc_text,
-                          label: 'Movimientos',
+                          label: 'Presupuesto',
                           onTap: () {
                             // Acción para ver movimientos
                           },
@@ -594,9 +640,15 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
                       Expanded(
                         child: _buildActionButton(
                           icon: CupertinoIcons.settings,
-                          label: 'Ajustes',
+                          label: 'Sugerencias',
                           onTap: () {
-                            // Acción para ajustes
+                            // Acción para ir a sugenrencias
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SuggestionsScreen(),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -716,6 +768,7 @@ class _AccountHomeScreenState extends State<AccountHomeScreen> {
         },
       ),
       // Botón para agregar nueva cuenta (opcional)
+
       floatingActionButton: AvatarGlow(
         animate: _speechToText.isListening,
         glowColor: Theme.of(context).primaryColor,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sw2_grupal_movil/models/SeggestionsGetModel.dart';
+import 'package:sw2_grupal_movil/services/healthScoreService.dart';
 import '../main.dart';
 import '../models/AccountGetModel.dart';
 import '../services/accountService.dart';
@@ -17,6 +19,20 @@ class AccountProvider extends SafeChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasAccounts => _accounts.isNotEmpty;
+
+  // //Metodo para setear una cuenta seleccionada
+  // void setSelectedAccount(AccountGetResponse account) {
+  //   _selectedAccount = account;
+  //   notifyListeners();
+  // }
+
+  SuggestionsGet? _dailySuggestions;
+  bool _isLoadingSuggestions = false;
+  String? _errorSuggestions;
+
+  SuggestionsGet? get dailySuggestions => _dailySuggestions;
+  bool get isLoadingSuggestions => _isLoadingSuggestions;
+  String? get errorSuggestions => _errorSuggestions;
 
   // Método para obtener todas las cuentas
   Future<void> fetchAccounts() async {
@@ -88,4 +104,38 @@ class AccountProvider extends SafeChangeNotifier {
       notifyListeners();
     }
   }
+
+  //Metodo para crear una cuenta
+  Future<AccountGetResponse> createAccount(
+      String name, int usuarioId, int balance) async {
+    try {
+      final newAccount =
+          await _accountService.createAccount(name, usuarioId, balance);
+      _accounts.add(newAccount);
+      notifyListeners();
+      return newAccount;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow; // Re-lanzamos la excepción para que el llamador pueda manejarla
+    }
+  }
+
+  // Método para obtener las sugerencias del día
+  Future<void> fetchDailySuggestions() async {
+    _isLoadingSuggestions = true;
+    _errorSuggestions = null;
+    notifyListeners();
+
+    try {
+      _dailySuggestions = await HealthScoreService().getDailySuggestions();
+    } catch (e) {
+      _errorSuggestions = e.toString();
+      _dailySuggestions = null;
+    }
+    _isLoadingSuggestions = false;
+    notifyListeners();
+  }
+
+  //metodo para obtener sugerencias del dia
 }

@@ -12,7 +12,9 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        baseUrl: 'http://192.168.100.63:3000/api/',
+        baseUrl: 'https://sw2-grupal-ermik.ondigitalocean.app/api/',
+        //https://hhdh65nq-3000.brs.devtunnels.ms/api/
+        //https://sw2-grupal-ermik.ondigitalocean.app/api/
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {

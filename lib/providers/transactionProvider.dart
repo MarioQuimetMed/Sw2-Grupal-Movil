@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sw2_grupal_movil/models/transactionGetByMonth.dart';
 import '../main.dart';
 import '../models/transacctionCreateModel.dart';
 import '../services/transactionService.dart';
@@ -15,6 +16,15 @@ class TransactionProvider extends SafeChangeNotifier {
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
   bool get hasTransaction => _lastTransaction != null;
+
+// Estado para transacciones por mes
+  List<TransactionGetByMonth> _transactionsByMonth = [];
+  bool _isLoadingTransactionsByMonth = false;
+  String? _errorTransactionsByMonth;
+
+  List<TransactionGetByMonth> get transactionsByMonth => _transactionsByMonth;
+  bool get isLoadingTransactionsByMonth => _isLoadingTransactionsByMonth;
+  String? get errorTransactionsByMonth => _errorTransactionsByMonth;
 
   /// Procesa una transacción utilizando IA a partir de un texto
   Future<bool> processTransactionWithAI(String text, int accountId) async {
@@ -81,5 +91,24 @@ class TransactionProvider extends SafeChangeNotifier {
   String formatAmount(int amount, String type) {
     final prefix = type.toLowerCase() == 'income' ? '+' : '-';
     return '$prefix $amount';
+  }
+
+  /// Obtiene las transacciones de una cuenta en un mes y año determinado
+  Future<void> fetchTransactionsByAccountAndDate(
+      int accountId, int month, int year) async {
+    _isLoadingTransactionsByMonth = true;
+    _errorTransactionsByMonth = null;
+    notifyListeners();
+
+    try {
+      _transactionsByMonth = await _transactionService
+          .getTransactionsByAccountAndDate(accountId, month, year);
+    } catch (e) {
+      _errorTransactionsByMonth = e.toString();
+      _transactionsByMonth = [];
+    }
+
+    _isLoadingTransactionsByMonth = false;
+    notifyListeners();
   }
 }

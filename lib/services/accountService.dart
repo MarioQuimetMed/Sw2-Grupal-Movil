@@ -59,4 +59,31 @@ class AccountService {
       throw 'Error inesperado: $e';
     }
   }
+
+  // Metodo para crear una cuenta
+  Future<AccountGetResponse> createAccount(
+      String name, int usuarioId, int balance) async {
+    try {
+      final response = await _dioClient.post(
+        'accounts',
+        data: {
+          'name': name,
+          'balance': balance,
+          'usuarioId': usuarioId,
+        },
+      );
+
+      return AccountGetResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw 'Datos de cuenta inválidos';
+      } else if (e.response?.statusCode == 409) {
+        throw 'Ya existe una cuenta con ese nombre';
+      } else {
+        throw 'Error al crear la cuenta: ${e.message}';
+      }
+    } catch (e) {
+      throw 'Error inesperado: $e';
+    }
+  }
 }
